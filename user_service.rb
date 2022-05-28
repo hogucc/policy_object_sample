@@ -4,22 +4,18 @@ class UserService
   end
 
   def name
-    if user.full_name.blank? && user.email.present?
-      user.email
-    else
-      user.full_name
-    end
+    user_policy.use_email_as_name? ? user.email : user.full_name
   end
 
   def account_name
-    if user.sign_in_count > 0 && user.role == "admin"
-      "Administrator"
-    else
-      "User"
-    end
+    user_policy.administrator_account_name? ? "Administrator" : "User"
   end
 
   private
-  
+
     attr_reader :user
+  
+    def user_policy
+      @_user_policy ||= UserPolicy.new(user)
+    end
 end
